@@ -35,10 +35,10 @@ class Main extends CI_Controller
             'tegangan' => $tegangan
         ];
 
-        var_dump($data);
-        die;
-
-        $this->db->insert('monitoring', $data);
-        echo 'BERHASIL';
+        if ($this->db->insert('monitoring', $data)) {
+            echo 'BERHASIL';
+        } else {
+            echo 'GAGAL';
+        }
     }
 }
