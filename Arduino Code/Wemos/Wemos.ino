@@ -4,7 +4,7 @@ const char* ssid = "FansElectronics"; // Nama WIFI kamu
 const char* password = "TukangSolder#"; // Password Wifi
 const char* host = "tryiot.online"; // Link website / Ip Server
 
-int suhu, kecepatan, tegangan;0
+int suhu, kecepatan, tegangan, count;
 bool Parsing = false;
 String dataPHP, data[8];
 void setup()
@@ -31,25 +31,28 @@ void loop() {
       }
     }
     suhu = data[1].toInt();
-    kecepatan = data[1].toInt();
-    tegangan = data[1].toInt();
+    kecepatan = data[2].toInt();
+    tegangan = data[3].toInt();
     dataPHP = "";
   }
 
-  WiFiClient client;
+  if (count >= 10) {
+    WiFiClient client;
+    if (client.connect(host, 80)) {
+      String url = "demo/simple-datalog/main/update?suhu=" + String(suhu) + "&kecepatan=" + String(kecepatan) + "&tegangan=" + String(tegangan);
+      client.print(String("GET /") + url + " HTTP/1.1\r\n" +
+                   "Host: " + host + "\r\n" +
+                   "Connection: close\r\n" +
+                   "\r\n"
+                  );
+      client.stop();
 
-  if (client.connect(host, 80)) {
-    String url = "demo/simple-datalog/main/update?suhu=" + suhu + "&kecepatan=" + kecepatan + "&tegangan=" + tegangan;
-    client.print(String("GET /") + url + " HTTP/1.1\r\n" +
-                 "Host: " + host + "\r\n" +
-                 "Connection: close\r\n" +
-                 "\r\n"
-                );
-    client.stop();
-
-  }
-  else {
-    client.stop();
+    }
+    else {
+      client.stop();
+    }
+    count = 0;
   }
   delay(1000); // Jeda pembacaan setiap 5 detik
+  count++;
 }
